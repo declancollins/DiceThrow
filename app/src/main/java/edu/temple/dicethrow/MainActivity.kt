@@ -6,6 +6,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import kotlin.apply
 
 class MainActivity : AppCompatActivity() {
@@ -13,27 +14,18 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (savedInstanceState == null) {
-            supportFragmentManager.beginTransaction()
-                .replace(
-                    R.id.fragmentContainerView,
-                    DieFragment.newInstance(6)
-                )
-                .replace(
-                    R.id.fragmentContainerView2,
-                    DieFragment.newInstance(24)
-                )
+        val dieViewModel = ViewModelProvider(this)[dieViewModel::class.java]
+
+        dieViewModel.setSides(20)
+
+        if(supportFragmentManager.findFragmentById(R.id.fragmentContainerView) == null)
+            supportFragmentManager
+                .beginTransaction()
+                .add(R.id.fragmentContainerView, DieFragment())
                 .commit()
+
+            findViewById<Button>(R.id.rollDiceButton).setOnClickListener {
+                dieViewModel.rollDice()
+            }
         }
-        val rollButton = findViewById<Button>(R.id.rollDiceButton)
-        rollButton.setOnClickListener {
-            val dieFragment = supportFragmentManager.findFragmentById(
-                R.id.fragmentContainerView
-            ) as? DieFragment
-            dieFragment?.throwDie()
-            val dieFragment2 = supportFragmentManager.findFragmentById(R.id.fragmentContainerView2) as? DieFragment
-            dieFragment?.throwDie()
-            dieFragment2?.throwDie()
-        }
-    }
 }
